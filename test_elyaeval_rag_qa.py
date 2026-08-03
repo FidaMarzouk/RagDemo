@@ -29,7 +29,7 @@ from ingest import chunk_text
 from embeddings import embed_text
 
 
-def run_app(user_input: str) -> tuple[str, list[str]]:
+def run_app(user_input: str, expected_output: str | None = None) -> tuple[str, list[str]]:
     """
     TODO 2: Call your own app here.
 
@@ -43,7 +43,7 @@ def run_app(user_input: str) -> tuple[str, list[str]]:
         result = answer_question(user_input)
         return result.answer, result.retrieved_chunks
     """
-    result = run_for_eval(user_input)
+    result = run_for_eval(user_input,expected_output= expected_output)
     return result["answer"], result["retrieval_context"]
 
 
@@ -51,13 +51,11 @@ GOLDENS = load_standard_dataset(task_type="rag_qa", ci_stage="nightly")
 
 
 # --- TODO 3: golden-context ingest/teardown -------------------------------
-# The goldens above come with their own ground-truth `context` passages,
+# The goldens above come with their own `context` passages,
 # unrelated to whatever your app's real corpus already contains. Without
 # seeding them in first, retrieval will find your app's *real* documents —
-# plausible-looking, but never a match for what the golden actually asks —
-# and every metric downstream inherits that mismatch, not just the ones
-# that read retrieval_context directly.
-#
+# plausible-looking, but never a match for what the golden actually asks.
+
 # DATABASE_URL below matches the same env var retriever.py uses.
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://raguser:ragpass@localhost:5432/ragdb")
 
@@ -104,7 +102,8 @@ ingest_golden_contexts = make_golden_context_fixture(GOLDENS, _ingest_passage, _
     ids=[g.additional_metadata.get("priority", "") + "_" + str(i) for i, g in enumerate(GOLDENS)],
 )
 def test_rag_qa(golden):
-    actual_output, retrieval_context = run_app(golden.input)
+    run_app(golden.input, expected_output=golden.expected_output)
+    assert_test(golden=golden)
 
     test_case = LLMTestCase(
         input=golden.input,

@@ -27,7 +27,7 @@ cp .env.example .env
 # edit .env and set GROQ_API_KEY
 
 python -m venv venv
-source venv/bin/activate   # or venv\Scripts\activate on Windows
+source venv\Scripts\activate
 pip install -r requirements.txt
 
 docker compose up -d       # starts Postgres with pgvector, applies schema.sql
