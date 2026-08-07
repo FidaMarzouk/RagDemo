@@ -2,7 +2,7 @@ import os
 
 import psycopg2
 from dotenv import load_dotenv
-from deepeval.tracing import observe, update_current_span
+from deepeval.tracing import observe, update_current_span, update_current_trace
 from deepeval.test_case import LLMTestCase
 
 from embeddings import embed_text
@@ -37,4 +37,5 @@ def retrieve(query: str, top_k: int = 3, expected_output: str | None = None) -> 
     update_current_span(test_case=LLMTestCase(
         input=query, retrieval_context=chunks, expected_output=expected_output,
     ))
+    update_current_trace(retrieval_context=chunks)
     return chunks
