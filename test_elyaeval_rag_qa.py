@@ -44,10 +44,10 @@ from pathlib import Path
 from deepeval.test_case import LLMTestCase
 import pytest
 
-from elyaeval import load_standard_dataset, evaluate_golden
+from elyaeval import load_standard_dataset, evaluate_golden, new_report_path
 from elyaeval.metrics import RAG_METRICS
 
-REPORT_CSV = Path("report/results_rag_qa.csv")
+REPORT_CSV = new_report_path("rag_qa")
 
 import os
 import requests
@@ -69,11 +69,12 @@ GOLDENS = load_standard_dataset(
 
 
 @pytest.mark.parametrize(
-    "golden",
-    GOLDENS,
+    "indexed_golden",
+    list(enumerate(GOLDENS)),
     ids=[g.additional_metadata.get("priority", "") + "_" + str(i) for i, g in enumerate(GOLDENS)],
 )
-def test_rag_qa(golden):
+def test_rag_qa(indexed_golden):
+    index, golden = indexed_golden
     actual_output, retrieval_context = run_app(golden.input)
 
     test_case = LLMTestCase(
@@ -86,6 +87,10 @@ def test_rag_qa(golden):
 
     # One evaluate() call per golden (test_cases=[test_case], never the
     # whole GOLDENS list) — keeps scoring per-golden and gives each a
-    # clean row (or rows, one per metric) in REPORT_CSV.
-    result = evaluate_golden(golden, test_case, RAG_METRICS, csv_path=REPORT_CSV)
+    # clean row (or rows, one per metric) in REPORT_CSV. fallback_index=index
+    # is what makes golden_id unique per row (e.g. "p1_0" vs "p1_1") instead
+    # of every golden sharing the same priority-only id.
+    result = evaluate_golden(
+        golden, test_case, RAG_METRICS, csv_path=REPORT_CSV, fallback_index=index
+    )
     assert result.success, f"{result.name} failed — see {REPORT_CSV} for per-metric scores"
