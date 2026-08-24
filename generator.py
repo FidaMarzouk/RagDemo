@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 
 from dotenv import load_dotenv
 from groq import Groq
@@ -10,7 +11,16 @@ from elyaeval.metrics import GENERATION_METRICS
 load_dotenv()
 
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+
+@lru_cache
+def _client() -> Groq:
+    # Lazy + cached: constructed on first real use, not at import time.
+    # Keeps module import (and therefore pytest collection) safe even in
+    # environments where GROQ_API_KEY isn't set yet — the error only
+    # surfaces if generate_answer() is actually called without it.
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant answering questions using only the provided context. "
@@ -24,7 +34,7 @@ def generate_answer(query: str, context_chunks: list[str]) -> str:
     context_block = "\n\n".join(f"[{i+1}] {c}" for i, c in enumerate(context_chunks))
     user_prompt = f"Context:\n{context_block}\n\nQuestion: {query}\n\nAnswer:"
 
-    response = client.chat.completions.create(
+    response = _client().chat.completions.create(
         model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},

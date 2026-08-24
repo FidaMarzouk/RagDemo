@@ -52,6 +52,15 @@
 #     --from-literal=api-key=$env:ANTHROPIC_API_KEY `
 #     -n elyaeval --dry-run=client -o yaml | kubectl apply -f -
 #
+# ragdemo-sut-env holds env vars needed by THIS SUT's own code (in-process
+# component eval imports rag_core.py -> generator.py, which constructs a
+# Groq client from GROQ_API_KEY). ONLY needed because test-file above is
+# the component template; the e2e template needs none of this. Create/
+# update it before applying:
+#   kubectl create secret generic ragdemo-sut-env `
+#     --from-literal=GROQ_API_KEY=$env:GROQ_API_KEY `
+#     -n elyaeval --dry-run=client -o yaml | kubectl apply -f -
+#
 # blob-storage-credentials holds the full Azure Storage connection string
 # (Azurite locally, a real Storage Account in higher envs). Create/update
 # it once per cluster/namespace before applying:
@@ -76,6 +85,8 @@ spec:
       value: test_elyaeval_rag_qa_component.py
     - name: sut-requirements-file
       value: requirements.txt
+    - name: sut-env-secret-name
+      value: ragdemo-sut-env
 
     # Judge model — left as shell placeholders, see the comment block above
     # for what to set per provider. judge-api-key-secret-* stay fixed:
