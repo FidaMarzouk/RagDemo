@@ -21,6 +21,17 @@ _loop = importlib.import_module("deepeval.evaluate.execute.loop")
 
 def _patched_create_api_trace(trace, golden):
     if trace.end_time is None:
+        from deepeval.tracing.tracing import trace_manager
+        leaked = [
+            (s.name, s.uuid, s.parent_uuid)
+            for s in trace_manager.active_spans.values()
+            if s.trace_uuid == trace.uuid
+        ]
+        if leaked:
+            print(
+                f"[elyaeval] end_time was None for golden={golden.input!r}; "
+                f"still-active spans at that moment: {leaked}"
+            )
         trace.end_time = perf_counter()
     return _original_create_api_trace(trace, golden)
 
