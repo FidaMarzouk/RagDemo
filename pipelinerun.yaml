@@ -86,7 +86,7 @@ spec:
     - name: sut-requirements-file
       value: requirements.txt
     - name: sut-env-secret-name
-      value: ragdemo-sut-env
+      value: groq-credentials
 
     # Judge model — left as shell placeholders, see the comment block above
     # for what to set per provider. judge-api-key-secret-* stay fixed:
