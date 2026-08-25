@@ -41,10 +41,15 @@ from pathlib import Path
 from deepeval.dataset import Golden
 import pytest
 
-from elyaeval import load_standard_dataset
+from elyaeval import load_standard_dataset, new_report_path
 from elyaeval.tracing_report import TracedRunner, golden_id, append_traced_csv_rows, traced_test_result_to_csv_rows
 
-REPORT_CSV = Path("report/results_rag_qa_component.csv")
+# Was hardcoded to report/results_rag_qa_component.csv — every run overwrote/appended
+# into the SAME file with no way to tell runs apart once uploaded (blob name derives
+# from this filename in recipes/tekton/tasks.yaml). new_report_path() stamps a UTC
+# timestamp into the filename instead, e.g. results_rag_qa_component_20260825T130000Z.csv
+# — matches what the generated template already does, this file just predates that.
+REPORT_CSV = new_report_path("rag_qa_component")
 
 # TODO 1: import your app's traced entrypoint, in-process, e.g.:
 from rag_core import run_for_eval
