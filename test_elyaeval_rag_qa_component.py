@@ -15,7 +15,7 @@ the e2e one tells you whether the app's final answer is still good.
 
 Requirements on the SUT side for this to produce anything:
   - the traced entrypoint function (imported below) must be decorated
-    with @observe (or wrap internal calls that are)
+    with @observe
   - each span you want scored must declare its own metrics via
     @observe(metrics=[...]) and call update_current_span(test_case=...)
     inside that function — this file does NOT pass span-level metrics in;
