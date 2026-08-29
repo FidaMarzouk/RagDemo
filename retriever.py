@@ -14,7 +14,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://raguser:ragpass@localhost
 
 
 @observe(metrics=RETRIEVAL_METRICS)
-def retrieve(query: str, top_k: int = 0, expected_output: str | None = None) -> list[str]:
+def retrieve(query: str, top_k: int = 1, expected_output: str | None = None) -> list[str]:
     """Embed the query and return the top_k most similar chunks by cosine distance."""
     query_vector = embed_text(query)
 
