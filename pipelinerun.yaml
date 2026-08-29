@@ -56,8 +56,9 @@
 # component eval imports rag_core.py -> generator.py, which constructs a
 # Groq client from GROQ_API_KEY). ONLY needed because test-file above is
 # the component template; the e2e template needs none of this. Create/
-# update it before applying:
-#   kubectl create secret generic sut-env-secret-name `
+# update it before applying — the secret's NAME must match the value used
+# below (groq-credentials), not the param name itself:
+#   kubectl create secret generic groq-credentials `
 #     --from-literal=GROQ_API_KEY=$env:GROQ_API_KEY `
 #     -n elyaeval --dry-run=client -o yaml | kubectl apply -f -
 #
@@ -67,6 +68,16 @@
 #   kubectl create secret generic blob-storage-credentials `
 #     --from-literal=connection-string=$env:AZURE_STORAGE_CONNECTION_STRING `
 #     -n elyaeval --dry-run=client -o yaml | kubectl apply -f -
+#
+# REGRESSION GATE (check-regression, see tasks.yaml): compares this run's
+# per-metric averages against a baseline_<task-type>.csv blob and fails the
+# PipelineRun if any metric dropped by more than regression-tolerance
+# (default "0.02" if omitted below). Self-gating: with no baseline blob
+# yet, every run just skips this check and passes. promote-baseline below
+# is set to "true" for THIS run only, to bootstrap that baseline — set it
+# back to "false" (or remove the param, same effect) for ordinary runs
+# once a baseline exists, so a normal run never silently moves the
+# baseline other runs compare against.
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
@@ -108,6 +119,11 @@ spec:
       value: blob-storage-credentials
     - name: blob-connection-string-secret-key
       value: connection-string
+
+    # Bootstrap run — see the REGRESSION GATE comment above. Set back to
+    # "false" (or delete this param) after this run succeeds once.
+    - name: promote-baseline
+      value: "true"
   workspaces:
     - name: source
       volumeClaimTemplate:

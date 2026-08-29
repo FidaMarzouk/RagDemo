@@ -64,24 +64,6 @@ TRACE_METRICS = []
 
 def call_sut(golden: Golden) -> None:
     run_for_eval(golden.input, expected_output=golden.expected_output)
-    """
-    TODO 2: call your app's traced entrypoint here, in-process.
-
-    Must be a plain call that runs your app for `golden.input` — nothing
-    needs to be returned. DeepEval reads the SUT's output back off the
-    span/trace it recorded via @observe + update_current_span/
-    update_current_trace, not off this function's return value.
-
-    e.g.:
-        def call_sut(golden):
-            run_for_eval(golden.input, expected_output=golden.expected_output)
-
-    This MUST be an in-process import + call (see module docstring for
-    why) — there is no HTTP equivalent for this template, unlike
-    test_elyaeval_rag_qa.py's run_app().
-    """
-    
-    
 
 
 GOLDENS = load_standard_dataset(
