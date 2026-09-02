@@ -5,7 +5,7 @@ from generator import generate_answer
 
 
 @observe()
-def run_for_eval(query: str, top_k: int = 1, expected_output: str | None = None) -> dict:
+def run_for_eval(query: str, top_k: int = 5, expected_output: str | None = None) -> dict:
     """Full RAG pass for a single query — call directly from eval scripts or other Python code."""
     retrieval_context = retrieve(query, top_k=top_k, expected_output=expected_output)
     answer = generate_answer(query, retrieval_context)

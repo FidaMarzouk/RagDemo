@@ -93,7 +93,7 @@ spec:
     - name: sut-url
       value: ${SUT_URL}
     - name: test-file
-      value: test_elyaeval_rag_qa_component.py
+      value: test_elyaeval_rag_qa.py
     - name: sut-requirements-file
       value: requirements.txt
     - name: sut-env-secret-name
@@ -123,7 +123,7 @@ spec:
     # Bootstrap run — see the REGRESSION GATE comment above. Set back to
     # "false" (or delete this param) after this run succeeds once.
     - name: promote-baseline
-      value: "false"
+      value: "true"
   workspaces:
     - name: source
       volumeClaimTemplate:
