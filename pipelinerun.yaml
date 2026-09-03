@@ -123,7 +123,7 @@ spec:
     # Bootstrap run — see the REGRESSION GATE comment above. Set back to
     # "false" (or delete this param) after this run succeeds once.
     - name: promote-baseline
-      value: "true"
+      value: "false"
   workspaces:
     - name: source
       volumeClaimTemplate:
