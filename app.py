@@ -34,7 +34,7 @@ class QueryRequest(BaseModel):
     """HTTP request body for /query endpoint."""
 
     query: str
-    top_k: Optional[int] = 1
+    top_k: Optional[int] = 4
     expected_output: Optional[str] = None
 
 
